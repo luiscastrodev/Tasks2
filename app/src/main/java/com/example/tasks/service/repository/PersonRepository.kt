@@ -1,5 +1,7 @@
 package com.example.tasks.service.repository
 
+import android.content.Context
+import com.example.tasks.R
 import com.example.tasks.service.HeaderModel
 import com.example.tasks.service.constants.TaskConstants
 import com.example.tasks.service.listener.APIListener
@@ -9,8 +11,9 @@ import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.Exception
 
-class PersonRepository {
+class PersonRepository(val context:Context) {
 
     private val remote = RetrofitClient.createService(PersonService::class.java)
 
@@ -23,7 +26,7 @@ class PersonRepository {
 
                 if(response.code() != TaskConstants.HTTP.SUCCESS)
                 {
-                    val validation = Gson().fromJson(response.errorBody()!!.string(), String::class.java)
+                    val validation = Gson().fromJson(response.errorBody()?.string(), String::class.java)
                     listener.onError(validation)
                 }else{
                     response.body()?.let {
@@ -31,10 +34,10 @@ class PersonRepository {
                     }
                 }
             }
-
             override fun onFailure(call: Call<HeaderModel>, t: Throwable) {
-                listener.onError(t.message.toString())
+                listener.onError(context.getString(R.string.ERROR_UNEXPECTED))
             }
         })
+
     }
 }
