@@ -57,12 +57,26 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
      */
     private fun observe() {
         mViewModel.login.observe(this, Observer {
-            if(it.sucess()){
+            if(it.status){
                 startActivity(Intent(this,MainActivity::class.java))
             }else{
-                Toast.makeText(this,it.failure(),Toast.LENGTH_SHORT).show()
+                startDashboard()
             }
         })
+
+        mViewModel.loggedUser.observe(this, Observer {
+            if(it){
+                startDashboard()
+            }
+        })
+    }
+
+    /**
+     * inicia DashBoard
+     */
+
+    fun startDashboard(){
+        startActivity(Intent(this,MainActivity::class.java))
     }
 
     /**
