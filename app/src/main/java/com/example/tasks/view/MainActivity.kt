@@ -61,7 +61,6 @@ class MainActivity : AppCompatActivity() {
             setOf(R.id.nav_all_tasks, R.id.nav_next_tasks, R.id.nav_expired, R.id.nav_logout),
             drawerLayout
         )
-
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
     }

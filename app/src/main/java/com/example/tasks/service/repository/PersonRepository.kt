@@ -13,7 +13,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.lang.Exception
 
-class PersonRepository(val context:Context) {
+class PersonRepository(val context: Context) {
 
     private val remote = RetrofitClient.createService(PersonService::class.java)
 
@@ -24,16 +24,41 @@ class PersonRepository(val context:Context) {
         call.enqueue(object : Callback<HeaderModel> {
             override fun onResponse(call: Call<HeaderModel>, response: Response<HeaderModel>) {
 
-                if(response.code() != TaskConstants.HTTP.SUCCESS)
-                {
-                    val validation = Gson().fromJson(response.errorBody()?.string(), String::class.java)
+                if (response.code() != TaskConstants.HTTP.SUCCESS) {
+                    val validation =
+                        Gson().fromJson(response.errorBody()?.string(), String::class.java)
                     listener.onError(validation)
-                }else{
+                } else {
                     response.body()?.let {
                         listener.onSucess(response = it)
                     }
                 }
             }
+
+            override fun onFailure(call: Call<HeaderModel>, t: Throwable) {
+                listener.onError(context.getString(R.string.ERROR_UNEXPECTED))
+            }
+        })
+
+    }
+
+    fun create(email: String, password: String, name: String, listener: APIListener<HeaderModel>) {
+
+        //remote
+        val call: Call<HeaderModel> = remote.create(email, password, name,true)
+        call.enqueue(object : Callback<HeaderModel> {
+            override fun onResponse(call: Call<HeaderModel>, response: Response<HeaderModel>) {
+
+                if (response.code() != TaskConstants.HTTP.SUCCESS) {
+                    val validation = Gson().fromJson(response.errorBody()?.string(), String::class.java)
+                    listener.onError(validation)
+                } else {
+                    response.body()?.let {
+                        listener.onSucess(response = it)
+                    }
+                }
+            }
+
             override fun onFailure(call: Call<HeaderModel>, t: Throwable) {
                 listener.onError(context.getString(R.string.ERROR_UNEXPECTED))
             }
