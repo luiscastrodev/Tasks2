@@ -11,35 +11,39 @@ import com.example.tasks.service.listener.Main
 import com.example.tasks.service.repository.PersonRepository
 import com.example.tasks.service.repository.PriorityRepository
 import com.example.tasks.service.repository.local.SecurityPreferences
+import com.example.tasks.service.repository.remote.RetrofitClient
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val mPersonRepository  = PersonRepository(application)
-    private val mPriorityRepository  = PriorityRepository (application)
+    private val mPersonRepository = PersonRepository(application)
+    private val mPriorityRepository = PriorityRepository(application)
 
-    private  val mSharedPreferences = SecurityPreferences(application)
+    private val mSharedPreferences = SecurityPreferences(application)
 
     private val mLogin = MutableLiveData<Main<Unit>>()
-    var login : LiveData<Main<Unit>> = mLogin
+    var login: LiveData<Main<Unit>> = mLogin
 
     private val mLoggedUser = MutableLiveData<Boolean>()
-    var loggedUser : LiveData<Boolean> = mLoggedUser
+    var loggedUser: LiveData<Boolean> = mLoggedUser
 
     /**
      * Faz login usando API
      */
     fun doLogin(email: String, password: String) {
-        mPersonRepository.login(email,password, object : APIListener<HeaderModel> {
+        mPersonRepository.login(email, password, object : APIListener<HeaderModel> {
             override fun onSucess(response: HeaderModel) {
 
-                mSharedPreferences.store(TaskConstants.SHARED.TOKEN_KEY,response.token)
-                mSharedPreferences.store(TaskConstants.SHARED.PERSON_KEY,response.personKey)
-                mSharedPreferences.store(TaskConstants.SHARED.PERSON_NAME,response.name)
+                mSharedPreferences.store(TaskConstants.SHARED.TOKEN_KEY, response.token)
+                mSharedPreferences.store(TaskConstants.SHARED.PERSON_KEY, response.personKey)
+                mSharedPreferences.store(TaskConstants.SHARED.PERSON_NAME, response.name)
+
+                RetrofitClient.addHeader(response.token, response.personKey)
 
                 mLogin.value = Main<Unit>().apply {
                     this.status = true
                 }
             }
+
             override fun onError(erro: String) {
                 mLogin.value = Main<Unit>().apply {
                     this.message = erro
@@ -55,9 +59,11 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     fun verifyLoggedUser() {
         val token = mSharedPreferences.get(TaskConstants.SHARED.TOKEN_KEY)
         val personKey = mSharedPreferences.get(TaskConstants.SHARED.PERSON_KEY)
-        val logged =  token.isNotEmpty()  && personKey.isNotEmpty()
+        val logged = token.isNotEmpty() && personKey.isNotEmpty()
 
-        if(!logged){
+        RetrofitClient.addHeader(token, personKey)
+
+        if (!logged) {
             mPriorityRepository.all()
         }
 
