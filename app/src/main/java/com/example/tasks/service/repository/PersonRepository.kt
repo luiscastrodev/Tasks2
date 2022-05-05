@@ -12,12 +12,16 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class PersonRepository(val context: Context) {
+class PersonRepository(val context: Context) : BaseRepository(context) {
 
     private val remote = RetrofitClient.createService(PersonService::class.java)
 
     fun login(email: String, password: String, listener: APIListener<HeaderModel>) {
-
+        if(!isConnectionAvailable(context))
+        {
+            listener.onError(context.getString(R.string.ERROR_INTERNET_CONNECTION))
+            return
+        }
         //remote login
         val call: Call<HeaderModel> = remote.login(email, password)
         call.enqueue(object : Callback<HeaderModel> {
@@ -42,7 +46,11 @@ class PersonRepository(val context: Context) {
     }
 
     fun create(email: String, password: String, name: String, listener: APIListener<HeaderModel>) {
-
+        if(!isConnectionAvailable(context))
+        {
+            listener.onError(context.getString(R.string.ERROR_INTERNET_CONNECTION))
+            return
+        }
         //remote
         val call: Call<HeaderModel> = remote.create(email, password, name,true)
         call.enqueue(object : Callback<HeaderModel> {

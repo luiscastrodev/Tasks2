@@ -77,6 +77,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
     fun startDashboard(){
         startActivity(Intent(this,MainActivity::class.java))
+        finish()
     }
 
     /**

@@ -76,6 +76,9 @@ class AllTasksFragment : Fragment() {
             if (it.status) {
                 if (it.data != null)
                     mAdapter.setItens(it.data!!)
+            }else{
+                Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+
             }
         })
 
