@@ -18,7 +18,45 @@ class AllTasksViewModel(application: Application) : AndroidViewModel(application
     private val mTaskList = MutableLiveData<Main<List<TaskModel>>>()
     var tasks: LiveData<Main<List<TaskModel>>> = mTaskList
 
-     fun all() {
+    fun undo(id: Int) {
+        mTaskRepository.undo(id, object : APIListener<Boolean> {
+            override fun onSucess(response: Boolean) {
+                all()
+            }
+
+            override fun onError(erro: String) {
+                TODO("Not yet implemented")
+            }
+
+        })
+    }
+
+    fun complete(id: Int) {
+        mTaskRepository.complete(id, object : APIListener<Boolean> {
+            override fun onSucess(response: Boolean) {
+                all()
+            }
+
+            override fun onError(erro: String) {
+                TODO("Not yet implemented")
+            }
+        })
+    }
+
+
+    fun delete(id: Int) {
+        mTaskRepository.delete(id, object : APIListener<Boolean> {
+            override fun onSucess(response: Boolean) {
+                all()
+            }
+
+            override fun onError(erro: String) {
+                TODO("Not yet implemented")
+            }
+        })
+    }
+
+    fun all() {
         mTaskRepository.all(object : APIListener<List<TaskModel>> {
             override fun onSucess(response: List<TaskModel>) {
                 mTaskList.value = Main<List<TaskModel>>().apply {
@@ -26,6 +64,7 @@ class AllTasksViewModel(application: Application) : AndroidViewModel(application
                     this.data = response
                 }
             }
+
             override fun onError(erro: String) {
                 mTaskList.value = Main<List<TaskModel>>().apply {
                     this.status = false

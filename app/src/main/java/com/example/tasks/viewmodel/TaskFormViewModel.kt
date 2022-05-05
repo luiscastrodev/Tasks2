@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.example.tasks.service.listener.APIListener
 import com.example.tasks.service.listener.Main
 import com.example.tasks.service.listener.ValidationListener
@@ -23,6 +24,9 @@ class TaskFormViewModel(application: Application) : AndroidViewModel(application
     private val mValidation = MutableLiveData<ValidationListener>()
     var validation: LiveData<ValidationListener> = mValidation
 
+    private val mTask = MutableLiveData<TaskModel>()
+    var task: LiveData<TaskModel> = mTask
+
     fun listPriorities() {
         mPriorityList.value = Main<List<PriorityModel>>().apply {
             this.status = true
@@ -31,6 +35,8 @@ class TaskFormViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun save(task: TaskModel) {
+
+        if (task.id == 0)
         mTaskRepository.create(task, object : APIListener<Boolean> {
             override fun onSucess(response: Boolean) {
                 mValidation.value = ValidationListener()
@@ -40,6 +46,30 @@ class TaskFormViewModel(application: Application) : AndroidViewModel(application
                 mValidation.value = ValidationListener(erro)
             }
 
+        })
+        else{
+            mTaskRepository.update(task, object : APIListener<Boolean> {
+                override fun onSucess(response: Boolean) {
+                    mValidation.value = ValidationListener()
+                }
+
+                override fun onError(erro: String) {
+                    mValidation.value = ValidationListener(erro)
+                }
+
+            })
+        }
+    }
+
+    fun load(taskId:Int){
+        mTaskRepository.load(taskId, object : APIListener<TaskModel> {
+            override fun onError(erro: String) {
+
+            }
+
+            override fun onSucess(response: TaskModel) {
+                mTask.value = response
+            }
         })
     }
 
