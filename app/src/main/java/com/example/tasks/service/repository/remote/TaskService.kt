@@ -8,7 +8,7 @@ import retrofit2.http.*
 interface TaskService {
 
     @GET("Task")
-    fun all(): Call<List<TaskModel>>
+        fun all(): Call<List<TaskModel>>
 
     @GET("Task/Next7Days")
     fun nextWeek(): Call<List<TaskModel>>

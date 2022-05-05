@@ -5,6 +5,7 @@ import com.example.tasks.service.constants.TaskConstants
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -18,21 +19,23 @@ class RetrofitClient private constructor() {
 
         private fun getRetrofitInstance(): Retrofit {
             val httpClient = OkHttpClient.Builder()
+            val logging = HttpLoggingInterceptor()
+            logging.level = HttpLoggingInterceptor.Level.BODY
+            httpClient.addInterceptor(logging);  // <-- this is the important line!
 
-            httpClient.addInterceptor(object : Interceptor {
-                override fun intercept(chain: Interceptor.Chain): Response {
-                    Log.d("RetrofitClient", personKey)
-                    Log.d("RetrofitClient", tokenKey)
+            httpClient.addInterceptor { chain ->
+                Log.d("RetrofitClient", personKey)
+                Log.d("RetrofitClient", tokenKey)
 
-                    val request = chain.request().newBuilder()
-                        .addHeader(TaskConstants.HEADER.PERSON_KEY, personKey)
-                        .addHeader(TaskConstants.HEADER.TOKEN_KEY, tokenKey)
-                        .build()
-                    return chain.proceed(request)
-                }
-            })
+                val request = chain.request().newBuilder()
+                    .addHeader(TaskConstants.HEADER.PERSON_KEY, personKey)
+                    .addHeader(TaskConstants.HEADER.TOKEN_KEY, tokenKey)
+                    .build()
+                chain.proceed(request)
+            }
 
             if (!Companion::retrofit.isInitialized) {
+
                 retrofit = Retrofit.Builder()
                     .baseUrl(baseURl)
                     .client(httpClient.build())

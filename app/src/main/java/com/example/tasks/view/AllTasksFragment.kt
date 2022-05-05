@@ -52,6 +52,8 @@ class AllTasksFragment : Fragment() {
             }
         }
 
+        mViewModel.all()
+
         // Cria os observadores
         observe()
 
@@ -64,6 +66,13 @@ class AllTasksFragment : Fragment() {
         mAdapter.attachListener(mListener)
     }
 
-    private fun observe() {}
+    private fun observe() {
+        mViewModel.tasks.observe(viewLifecycleOwner, Observer {
+            if (it.status) {
+                if(it.data != null)
+                mAdapter.setItens(it.data!!)
+            }
+        })
+    }
 
 }
