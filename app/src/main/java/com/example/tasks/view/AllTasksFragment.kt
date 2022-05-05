@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -55,7 +56,7 @@ class AllTasksFragment : Fragment() {
             }
         }
 
-       // mViewModel.all()
+        // mViewModel.all()
 
         // Cria os observadores
         observe()
@@ -73,9 +74,16 @@ class AllTasksFragment : Fragment() {
     private fun observe() {
         mViewModel.tasks.observe(viewLifecycleOwner, Observer {
             if (it.status) {
-                if(it.data != null)
-                mAdapter.setItens(it.data!!)
+                if (it.data != null)
+                    mAdapter.setItens(it.data!!)
             }
+        })
+
+        mViewModel.validation.observe(viewLifecycleOwner, Observer {
+            if (!it.status)
+                Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+            else
+                Toast.makeText(context, getString(R.string.task_removed), Toast.LENGTH_SHORT).show()
         })
     }
 

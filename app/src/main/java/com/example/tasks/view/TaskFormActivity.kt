@@ -99,7 +99,8 @@ class TaskFormActivity : AppCompatActivity(), View.OnClickListener,
 
         mViewModel.validation.observe(this, androidx.lifecycle.Observer {
             if(it.sucess()){
-                Toast.makeText(this,"Sucesso",Toast.LENGTH_SHORT).show()
+                if(mTaskId == 0)Toast.makeText(this,getString(R.string.task_created),Toast.LENGTH_SHORT).show()
+                else Toast.makeText(this,getString(R.string.task_updated),Toast.LENGTH_SHORT).show()
                 finish()
             }else{
                 Toast.makeText(this,it.failure(),Toast.LENGTH_SHORT).show()
