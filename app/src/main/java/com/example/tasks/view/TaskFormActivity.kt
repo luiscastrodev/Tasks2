@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.DatePicker
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.example.tasks.R
 import com.example.tasks.service.model.TaskModel
@@ -40,8 +41,7 @@ class TaskFormActivity : AppCompatActivity(), View.OnClickListener,
     override fun onClick(v: View) {
         val id = v.id
         if (id == R.id.button_save) {
-
-
+            handleSave()
         } else if (id == R.id.button_date) {
             showDatePicker()
         }
@@ -56,8 +56,8 @@ class TaskFormActivity : AppCompatActivity(), View.OnClickListener,
         }
 
         mViewModel.save(task)
-
     }
+
 
     private fun showDatePicker() {
         val c = Calendar.getInstance()
@@ -78,6 +78,15 @@ class TaskFormActivity : AppCompatActivity(), View.OnClickListener,
             }
             val adapter = ArrayAdapter(this,android.R.layout.simple_spinner_dropdown_item,list)
             spinner_priority.adapter = adapter
+        })
+
+        mViewModel.validation.observe(this, androidx.lifecycle.Observer {
+            if(it.sucess()){
+                Toast.makeText(this,"Sucesso",Toast.LENGTH_SHORT).show()
+                finish()
+            }else{
+                Toast.makeText(this,it.failure(),Toast.LENGTH_SHORT).show()
+            }
         })
     }
 

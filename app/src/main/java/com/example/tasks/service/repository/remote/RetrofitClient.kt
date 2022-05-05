@@ -1,5 +1,6 @@
 package com.example.tasks.service.repository.remote
 
+import android.util.Log
 import com.example.tasks.service.constants.TaskConstants
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -20,6 +21,8 @@ class RetrofitClient private constructor() {
 
             httpClient.addInterceptor(object : Interceptor {
                 override fun intercept(chain: Interceptor.Chain): Response {
+                    Log.d("RetrofitClient", personKey)
+                    Log.d("RetrofitClient", tokenKey)
 
                     val request = chain.request().newBuilder()
                         .addHeader(TaskConstants.HEADER.PERSON_KEY, personKey)
