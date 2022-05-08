@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.tasks.service.model.HeaderModel
 import com.example.tasks.service.constants.TaskConstants
+import com.example.tasks.service.helper.FingerPrintHelper
 import com.example.tasks.service.listener.APIListener
 import com.example.tasks.service.listener.Main
 import com.example.tasks.service.repository.PersonRepository
@@ -25,6 +26,29 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     private val mLoggedUser = MutableLiveData<Boolean>()
     var loggedUser: LiveData<Boolean> = mLoggedUser
+
+
+    private val mFingerPrint = MutableLiveData<Boolean>()
+    var fingerPrin: LiveData<Boolean> = mFingerPrint
+
+    fun isAuThenticationAvailable(){
+
+        val token = mSharedPreferences.get(TaskConstants.SHARED.TOKEN_KEY)
+        val personKey = mSharedPreferences.get(TaskConstants.SHARED.PERSON_KEY)
+        val logged = token.isNotEmpty() && personKey.isNotEmpty()
+
+        RetrofitClient.addHeader(token, personKey)
+
+        if (!logged) {
+            mPriorityRepository.all()
+        }
+
+        mLoggedUser.value = logged
+
+        if(FingerPrintHelper.isAuthenticationAvailable(getApplication())){
+            mFingerPrint.value = logged
+        }
+    }
 
     /**
      * Faz login usando API
